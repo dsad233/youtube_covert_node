@@ -58,10 +58,10 @@
   <pre>
   <code>
   - MP3 download
-  http://localhost:3000/mp3/download?youtubeUrl="DOWNLOAD_PATH"
+  http://localhost:3000/mp3/download?youtubeUrl="download youtube url"
   </br>
   - MP4 download
-  http://localhost:3000/mp4/download?youtubeUrl="DOWNLOAD_PATH"
+  http://localhost:3000/mp4/download?youtubeUrl="download youtube url"
   </code>
   </pre>
 
