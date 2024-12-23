@@ -27,7 +27,7 @@ app.get('/mp3/download', async (req, res) => {
             return res.status(400).json({ message: 'YouTube URL이 필요합니다.' });
         }
 
-        const tempName = "downloadfirst.mp3";
+        const tempName = "tempdownload.mp3";
         const outputName = "download.mp3"
         
         const tempPath = path.resolve(process.env.DOWNLOAD_PATH, tempName);
@@ -52,10 +52,10 @@ app.get('/mp3/download', async (req, res) => {
             const ffmpegCommand = `ffmpeg -i "${tempPath}" -b:a 320k "${outputPath}"`;
             exec(ffmpegCommand, (err, stdout, stderr) => {
                 if (err) {
-                    console.error('FFmpeg 변환 오류:', err);
+                    console.error("변환 오류 발생 : ", err);
                     reject(err);
                 } else {
-                    console.log('FFmpeg 변환 성공:', stdout || stderr);
+                    console.error("변환 성공 : ", stdout || stderr);
                     resolve();
                 }
             });
@@ -85,7 +85,7 @@ app.get('/mp4/download', async (req, res) => {
             return res.status(400).json({ message: 'YouTube URL이 필요합니다.' });
         }
 
-        const tempName = "download.webm"
+        const tempName = "tempdownload.webm"
         const outputName = "download.mp4";
         
         const tempPath = path.resolve(process.env.DOWNLOAD_PATH, tempName);
