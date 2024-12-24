@@ -10,6 +10,7 @@
 **Package list**
 - express
 - youtube-dl-exec
+- path
 - fs
 - dotenv
 - exec (child_process) = ffmpeg
@@ -20,7 +21,7 @@
 - npm
   <pre>
   <code>
-  npm install express youtube-dl-exec fs dotenv 
+  npm install express youtube-dl-exec path fs dotenv 
   </code>
   </pre>
   
