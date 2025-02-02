@@ -14,6 +14,7 @@
 - fs
 - dotenv
 - exec (child_process) = ffmpeg
+- cors
 
 </br>
 
