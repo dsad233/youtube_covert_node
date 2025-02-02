@@ -4,14 +4,18 @@ import path from "path";
 import fs from "fs";
 import dotenv from "dotenv";
 import { exec } from "child_process";
+import cors from "cors";
 dotenv.config();
 
 const app = express();
 const port = 3000;
 
-
 app.use(express.json());
 app.use(express.urlencoded({ extended : true }));
+app.use(cors({
+    origin: ['http://localhost:3111'],
+    credential : true
+}));
 
 app.listen(port, () => {
     console.log(port, "서버로 구동 중.");
@@ -55,7 +59,7 @@ app.get('/mp3/download', async (req, res) => {
                     console.error("변환 오류 발생 : ", err);
                     reject(err);
                 } else {
-                    console.error("변환 성공 : ", stdout || stderr);
+                    console.log("변환 성공 : ", stdout || stderr);
                     resolve();
                 }
             });
@@ -68,7 +72,7 @@ app.get('/mp3/download', async (req, res) => {
         fs.unlinkSync(tempPath);
         
         console.log("\n----- processing end -----");
-        return res.status(200).json({ message : "MP3 파일로 변환 성공!" });
+        return res.status(201).json({ message : "MP3 파일로 변환 성공!" });
     } catch (err) {
         console.error(err);
         return res.status(500).json({ message : "MP3로 변환 실패" });
@@ -112,7 +116,7 @@ app.get('/mp4/download', async (req, res) => {
                     console.error("변환 오류 발생 : ", err);
                     reject(err);
                 } else {
-                    console.error("변환 성공 : ", stdout || stderr);
+                    console.log("변환 성공 : ", stdout || stderr);
                     resolve();
                 }
             });
@@ -125,7 +129,7 @@ app.get('/mp4/download', async (req, res) => {
         fs.unlinkSync(tempPath);
 
         console.log("\n----- processing end -----");
-        return res.status(200).json({ message : "MP4 파일로 변환 성공!" });
+        return res.status(201).json({ message : "MP4 파일로 변환 성공!" });
     } catch (err) {
         console.error(err);
         return res.status(500).json({ message : "MP4로 변환 실패" });
