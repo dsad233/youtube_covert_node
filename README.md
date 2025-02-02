@@ -22,7 +22,7 @@
 - npm
   <pre>
   <code>
-  npm install express youtube-dl-exec path fs dotenv 
+  npm install
   </code>
   </pre>
   
@@ -67,6 +67,8 @@
   </code>
   </pre>
 
+</br>
 
-
-
+**Frontend Source**
+- Vite & React - SWC
+  - https://github.com/dsad233/youtube_convert_web
