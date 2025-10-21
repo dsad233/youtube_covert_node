@@ -3,11 +3,13 @@
 </br>
 
 **Package manager**
+
 - npm
 
 </br>
 
 **Package list**
+
 - express
 - youtube-dl-exec
 - path
@@ -19,37 +21,25 @@
 </br>
 
 **Install**
+
 - npm
   <pre>
   <code>
   npm install
   </code>
   </pre>
-  
-- brew
+
+- [ffmpeg](https://www.ffmpeg.org)
   <pre>
   <code>
   brew install ffmpeg
   </code>
   </pre>
 
-
 </br>
-
-
-**Default Setting**
-- .env
-  <pre>
-  <code>
-  DOWNLOAD_PATH = "Your download path result"
-  </code>
-  </pre>
-
-
-</br>
-
 
 **How to run?**
+
 - terminal
   <pre>
   <code>
@@ -70,5 +60,6 @@
 </br>
 
 **Frontend Source**
+
 - Vite & React - SWC
   - https://github.com/dsad233/youtube_convert_web
