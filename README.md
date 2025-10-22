@@ -14,7 +14,6 @@
 - youtube-dl-exec
 - path
 - fs
-- dotenv
 - exec (child_process) = ffmpeg
 - cors
 
