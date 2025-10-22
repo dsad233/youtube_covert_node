@@ -2,11 +2,9 @@ import express from "express";
 import yotubeconvert from "youtube-dl-exec";
 import path from "path";
 import fs from "fs";
-import dotenv from "dotenv";
 import { exec } from "child_process";
 import cors from "cors";
 import { fileURLToPath } from "url";
-dotenv.config();
 
 const app = express();
 const port = 3000;
