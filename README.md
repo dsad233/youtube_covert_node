@@ -5,6 +5,7 @@
 **Package manager**
 
 - npm
+- [python](https://www.python.org/downloads)
 
 </br>
 
