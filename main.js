@@ -15,7 +15,7 @@ app.use(
   cors({
     origin: ["http://localhost:3111"],
     credential: true,
-  })
+  }),
 );
 
 app.listen(port, () => {
@@ -64,7 +64,7 @@ app.get("/mp3/download", async (req, res) => {
       });
     });
 
-    if (!fs.existsSync(outputPath)) {
+    if (!(await fs.existsSync(outputPath))) {
       return res.status(500).json({ message: "MP3 파일 생성 실패" });
     }
 
@@ -79,7 +79,7 @@ app.get("/mp3/download", async (req, res) => {
     const { tempPath } = readPath(tempName);
 
     // 변환 전 파일 삭제
-    fs.unlinkSync(tempPath);
+    await fs.unlinkSync(tempPath);
   }
 });
 
@@ -124,7 +124,7 @@ app.get("/mp4/download", async (req, res) => {
       });
     });
 
-    if (!fs.existsSync(outputPath)) {
+    if (!(await fs.existsSync(outputPath))) {
       return res.status(500).json({ message: "MP4 파일 생성 실패" });
     }
 
@@ -136,10 +136,10 @@ app.get("/mp4/download", async (req, res) => {
   } finally {
     const tempName = "tempdownload.webm";
 
-    const { tempPath } = readPath(tempName, null);
+    const { tempPath } = readPath(tempName);
 
     // 변환 전 파일 삭제
-    fs.unlinkSync(tempPath);
+    await fs.unlinkSync(tempPath);
   }
 });
 
