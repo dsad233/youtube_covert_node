@@ -64,22 +64,18 @@ app.get("/mp3/download", async (req, res) => {
       });
     });
 
-    if (!(await fs.existsSync(outputPath))) {
+    if (!fs.existsSync(outputPath)) {
       return res.status(500).json({ message: "MP3 파일 생성 실패" });
     }
+
+    // 변환 전 파일 삭제
+    fs.unlinkSync(tempPath);
 
     console.log("\n----- processing end -----");
     return res.status(201).json({ message: "MP3 파일로 변환 성공!" });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "MP3로 변환 실패" });
-  } finally {
-    const tempName = "tempdownload.mp3";
-
-    const { tempPath } = readPath(tempName);
-
-    // 변환 전 파일 삭제
-    await fs.unlinkSync(tempPath);
   }
 });
 
@@ -94,7 +90,7 @@ app.get("/mp4/download", async (req, res) => {
       return res.status(400).json({ message: "YouTube URL이 필요합니다." });
     }
 
-    const tempName = "tempdownload.webm";
+    const tempName = "tempdownload.webm.mkv";
     const outputName = "download.mp4";
 
     const { tempPath, outputPath } = readPath(tempName, outputName);
@@ -124,22 +120,18 @@ app.get("/mp4/download", async (req, res) => {
       });
     });
 
-    if (!(await fs.existsSync(outputPath))) {
+    if (!fs.existsSync(outputPath)) {
       return res.status(500).json({ message: "MP4 파일 생성 실패" });
     }
+
+    // 변환 전 파일 삭제
+    fs.unlinkSync(tempPath);
 
     console.log("\n----- processing end -----");
     return res.status(201).json({ message: "MP4 파일로 변환 성공!" });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "MP4로 변환 실패" });
-  } finally {
-    const tempName = "tempdownload.webm";
-
-    const { tempPath } = readPath(tempName);
-
-    // 변환 전 파일 삭제
-    await fs.unlinkSync(tempPath);
   }
 });
 
