@@ -11,7 +11,6 @@ import { RedisRepository } from "./src/redis/redis.repository.js";
 import puppeteer from "puppeteer";
 import * as cheerio from "cheerio";
 import { sleep } from "./src/utils.js";
-import lamejs from "lamejs";
 
 const app = express();
 const port = 3000;
@@ -25,7 +24,7 @@ app.listen(port, () => {
 });
 
 // Youtube MP3로 다운로드
-app.get("/mp3/download", async (req, res) => {
+app.post("/mp3/download", async (req, res) => {
   try {
     const { url } = req.query;
 
@@ -53,7 +52,7 @@ app.get("/mp3/download", async (req, res) => {
       "LOCKED",
     );
 
-    const result = {};
+    const musicInfos = {};
 
     const browser = await puppeteer.launch({
       headless: true,
@@ -64,17 +63,25 @@ app.get("/mp3/download", async (req, res) => {
       waitUntil: "networkidle2",
     });
 
+    await page.waitForSelector("#title > h1 > yt-formatted-string", {
+      timeout: 1000,
+    });
+
     const content = await page.content();
     await sleep(600);
 
+    const nowPageUrl = await page.url();
+    const urlSlice = nowPageUrl.slice(nowPageUrl.indexOf("v=") + 2);
+
     const $ = cheerio.load(content);
 
-    const title = $("#title > h1 > yt-formatted-string").html();
-    const artist = $("#text > a").html();
+    const musicTitle = $("#title > h1 > yt-formatted-string").html();
+    const music_artist = $("#text > a").html();
 
-    if (title && artist) {
-      result["title"] = title;
-      result["artist"] = artist;
+    if (musicTitle && music_artist) {
+      musicInfos["title"] = musicTitle;
+      musicInfos["artist"] = music_artist;
+      musicInfos["image"] = `https://i.ytimg.com/vi/${urlSlice}/hqdefault.jpg`;
     }
 
     await browser.close();
@@ -111,7 +118,6 @@ app.get("/mp3/download", async (req, res) => {
           console.error("변환 오류 발생 : ", err);
           reject(err);
         } else {
-          console.log("변환 성공 : ", stdout || stderr);
           resolve();
         }
       });
@@ -126,39 +132,28 @@ app.get("/mp3/download", async (req, res) => {
     // 변환 전 파일 삭제
     fs.unlinkSync(tempPath);
 
-    const test = new ArrayBuffer(fs.readFileSync(outputPath));
-
-    const tmpResult = await concatArrayBuffers(
-      await fs.readFileSync(outputPath),
-    );
-
-    const samples = new Int16Array(tmpResult);
-    const buffer = [];
-    const mp3enc = new lamejs.Mp3Encoder(1, 44100, 128);
-    const remaining = samples.length;
-    const maxSamples = 1152;
-    for (var i = 0; remaining >= maxSamples; i += maxSamples) {
-      const mono = samples.subarray(i, i + maxSamples);
-      const mp3buf = mp3enc.encodeBuffer(mono);
-      if (mp3buf.length > 0) {
-        buffer.push(new Int8Array(mp3buf));
-      }
-      remaining -= maxSamples;
-    }
-    const d = mp3enc.flush();
-    if (d.length > 0) {
-      buffer.push(new Int8Array(d));
-    }
-
-    const blob = new Blob(buffer, { type: "audio/mp3" });
-
-    console.log("blob: ", blob);
-
     console.log("\n----- processing end -----");
-    return res.status(StatusCodes.OK).json({
-      message: "MP3 파일로 변환 성공!",
-      data: result,
-      // blob: mp3Data,
+    // 최종 버퍼 파일
+    const result = [];
+    const mp3File = fs.createReadStream(outputPath, { highWaterMark: 16 });
+
+    if (!mp3File) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ message: "MP3 파일 전송 실패" });
+    }
+
+    mp3File.on("data", (chunck) => {
+      result.push(chunck);
+    });
+
+    mp3File.on("end", () => {
+      const concatBuffer = Buffer.concat(result);
+      return res.status(StatusCodes.OK).json({
+        message: "MP3 파일로 변환 성공!",
+        data: musicInfos,
+        buffer: JSON.stringify(concatBuffer.toString("base64")),
+      });
     });
   } catch (err) {
     console.error(err);
@@ -173,7 +168,7 @@ app.get("/mp3/download", async (req, res) => {
 });
 
 // Youtube MP4로 다운로드
-app.get("/mp4/download", async (req, res) => {
+app.post("/mp4/download", async (req, res) => {
   try {
     const { url } = req.query;
 
@@ -263,11 +258,6 @@ app.get("/mp4/download", async (req, res) => {
   }
 });
 
-app.get("/test", async (req, res) => {
-  const blobData = fs.readFileSync("./download.mp3", { encoding: "utf-8" });
-  console.log("test: ", blobData);
-});
-
 // 파일 경로 read
 function readPath(tempName, outputName) {
   const __filename = fileURLToPath(import.meta.url);
@@ -279,20 +269,4 @@ function readPath(tempName, outputName) {
     : null;
 
   return { tempPath, outputPath };
-}
-
-async function concatArrayBuffers(bufs) {
-  let offset = 0;
-  let bytes = 0;
-  const bufs2 = bufs.map(function (buf, total) {
-    bytes += buf.byteLength;
-    return buf;
-  });
-  const buffer = new ArrayBuffer(bytes);
-  const store = new Uint8Array(buffer);
-  bufs2.forEach(function (buf) {
-    store.set(new Uint8Array(buf.buffer || buf, buf.byteOffset), offset);
-    offset += buf.byteLength;
-  });
-  return buffer;
 }
