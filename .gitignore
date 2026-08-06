@@ -3,4 +3,6 @@ node_modules
 package-lock.json
 .env
 download.mp3
+download.mp4
 tempdownload.mp3
+tempdownload.webm.mkv.webm

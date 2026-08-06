@@ -71,7 +71,10 @@ app.post("/mp3/download", async (req, res) => {
     await sleep(600);
 
     const nowPageUrl = await page.url();
-    const urlSlice = nowPageUrl.slice(nowPageUrl.indexOf("v=") + 2);
+    const urlSlice = nowPageUrl.slice(
+      nowPageUrl.indexOf("v=") + 2,
+      nowPageUrl.search("&", 1),
+    );
 
     const $ = cheerio.load(content);
 
@@ -196,6 +199,43 @@ app.post("/mp4/download", async (req, res) => {
       "LOCKED",
     );
 
+    const musicInfos = {};
+
+    const browser = await puppeteer.launch({
+      headless: true,
+    });
+    const page = await browser.newPage();
+
+    await page.goto(url.trim(), {
+      waitUntil: "networkidle2",
+    });
+
+    await page.waitForSelector("#title > h1 > yt-formatted-string", {
+      timeout: 1000,
+    });
+
+    const content = await page.content();
+    await sleep(600);
+
+    const nowPageUrl = await page.url();
+    const urlSlice = nowPageUrl.slice(
+      nowPageUrl.indexOf("v=") + 2,
+      nowPageUrl.search("&", 1),
+    );
+
+    const $ = cheerio.load(content);
+
+    const musicTitle = $("#title > h1 > yt-formatted-string").html();
+    const music_artist = $("#text > a").html();
+
+    if (musicTitle && music_artist) {
+      musicInfos["title"] = musicTitle;
+      musicInfos["artist"] = music_artist;
+      musicInfos["image"] = `https://i.ytimg.com/vi/${urlSlice}/hqdefault.jpg`;
+    }
+
+    await browser.close();
+
     const tempName = "tempdownload.webm.mkv.webm";
     const outputName = "download.mp4";
 
@@ -243,9 +283,28 @@ app.post("/mp4/download", async (req, res) => {
     fs.unlinkSync(tempPath);
 
     console.log("\n----- processing end -----");
-    return res
-      .status(StatusCodes.OK)
-      .json({ message: "MP4 파일로 변환 성공!" });
+
+    const result = [];
+    const mp4File = fs.createReadStream(outputPath, { highWaterMark: 16 });
+
+    if (!mp4File) {
+      return res
+        .status(StatusCodes.NOT_FOUND)
+        .json({ message: "MP4 파일 전송 실패" });
+    }
+
+    mp4File.on("data", (chunck) => {
+      result.push(chunck);
+    });
+
+    mp4File.on("end", () => {
+      const concatBuffer = Buffer.concat(result);
+      return res.status(StatusCodes.OK).json({
+        message: "MP4 파일로 변환 성공!",
+        data: musicInfos,
+        buffer: JSON.stringify(concatBuffer.toString("base64")),
+      });
+    });
   } catch (err) {
     console.error(err);
     return res
