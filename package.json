@@ -12,10 +12,15 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "cheerio": "^1.2.0",
     "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
     "express": "^4.21.2",
     "fs": "^0.0.1-security",
+    "http-status-codes": "^2.3.0",
     "path": "^0.12.7",
-    "youtube-dl-exec": "^3.1.1"
+    "puppeteer": "^25.3.0",
+    "redis": "^6.1.0",
+    "youtube-dl-exec": "^3.1.12"
   }
 }

@@ -1,3 +1,8 @@
 node_modules
 .DS_Store
 package-lock.json
+.env
+download.mp3
+download.mp4
+tempdownload.mp3
+tempdownload.webm.mkv.webm
