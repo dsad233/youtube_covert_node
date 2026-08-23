@@ -17,5 +17,6 @@ redisClient.on("connect", () => {
 });
 redisClient.on("error", (err) => {
   console.error("Redis Client Error", err);
+  process.exit(1);
 });
 redisClient.connect().then(); // redis v4 연결 (비동기)

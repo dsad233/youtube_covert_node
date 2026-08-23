@@ -6,7 +6,6 @@ import { exec } from "child_process";
 import { CorsConfig } from "./src/corsConfig.js";
 import { fileURLToPath } from "url";
 import { StatusCodes } from "http-status-codes";
-import { redisClient } from "./src/redisConfig.js";
 import { RedisRepository } from "./src/redis/redis.repository.js";
 import puppeteer from "puppeteer";
 import * as cheerio from "cheerio";
@@ -329,3 +328,8 @@ function readPath(tempName, outputName) {
 
   return { tempPath, outputPath };
 }
+
+process.on("SIGINT", () => {
+  console.log("애플리케이션 종료.");
+  process.exit(1);
+});
