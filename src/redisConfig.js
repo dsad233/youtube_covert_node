@@ -5,7 +5,7 @@ import {
   REDIS_HOST,
   REDIS_PORT,
   REDIS_DB,
-} from "./keys.js";
+} from "./common/keys.js";
 
 //* Redis 연결
 export const redisClient = redis.createClient({

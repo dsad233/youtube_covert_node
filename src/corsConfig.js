@@ -1,8 +1,9 @@
 import cors from "cors";
+import { SERVER_URL } from "./common/keys.js";
 
 export function CorsConfig() {
   return cors({
-    origin: ["http://localhost:5173"],
+    origin: [SERVER_URL],
     credential: true,
   });
 }
