@@ -2,6 +2,7 @@ node_modules
 .DS_Store
 package-lock.json
 .env
+.env.prod
 download.mp3
 download.mp4
 tempdownload.mp3
