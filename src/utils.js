@@ -1,6 +1,3 @@
-import { fileURLToPath } from "url";
-import path from "path";
-
 export const EnvironmentEnv = {
   PROD: "prod",
   DEV: "DEV",

@@ -4,7 +4,7 @@ import helmet from "helmet";
 import ApiRouter from "./src/apis/apis.router.js";
 import { LISTENING_PORT, NODE_ENV } from "./src/common/keys.js";
 
-import { CorsConfig } from "./src/corsConfig.js";
+import { CorsConfig } from "./src/common/middleware/corsConfig.js";
 import { EnvironmentEnv } from "./src/utils.js";
 import { ErrorMiddleware } from "./src/common/middleware/errorMiddleware.js";
 
