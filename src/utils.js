@@ -1,5 +1,5 @@
 export const EnvironmentEnv = {
-  PROD: "prod",
+  PROD: "PROD",
   DEV: "DEV",
   LOCAL: "LOCAL",
 };

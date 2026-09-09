@@ -1,7 +1,7 @@
 import { config } from "dotenv";
 import { EnvironmentEnv } from "../utils.js";
 
-if (process.env.NODE_ENV === EnvironmentEnv.PROD) {
+if (process.env.NODE_ENV.toUpperCase() === EnvironmentEnv.PROD) {
   config({ path: process.cwd() + "/" + ".env.prod" });
 } else {
   config({ path: process.cwd() + "/" + ".env" });
