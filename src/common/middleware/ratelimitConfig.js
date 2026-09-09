@@ -18,7 +18,7 @@ export function ratelimitConfig() {
       return ipKeyGenerator(req.ip, ipv6Subnet);
     },
     validate: {
-      ipv6SubnetOrKeyGenerator: true,
+      ipv6SubnetOrKeyGenerator: false,
     },
     handler: (_, res) => {
       return res.status(StatusCodes.TOO_MANY_REQUESTS).json({
