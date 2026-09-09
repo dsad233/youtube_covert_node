@@ -1,7 +1,13 @@
-import dotenv from "dotenv";
-dotenv.config();
+import { config } from "dotenv";
+import { EnvironmentEnv } from "../utils.js";
 
-/**
+if (process.env.NODE_ENV === EnvironmentEnv.PROD) {
+  config({ path: process.cwd() + "/" + ".env.prod" });
+} else {
+  config({ path: process.cwd() + "/" + ".env" });
+}
+
+/**s
  * Default
  */
 export const NODE_ENV = String(process.env.NODE_ENV);

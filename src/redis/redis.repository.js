@@ -1,4 +1,4 @@
-import { redisClient } from "../redisConfig.js";
+import { redisClient } from "./redis.config.js";
 
 export class RedisRepository {
   /**
