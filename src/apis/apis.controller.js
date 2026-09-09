@@ -52,11 +52,13 @@ export class ApisController {
 
       const browser = await puppeteer.launch({
         headless: true,
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
       });
       const page = await browser.newPage();
 
       await page.goto(url.trim(), {
         waitUntil: "networkidle2",
+        timeout: 300000, // 5분
       });
 
       await page.waitForSelector("#title > h1 > yt-formatted-string", {
@@ -206,6 +208,7 @@ export class ApisController {
 
       await page.goto(url.trim(), {
         waitUntil: "networkidle2",
+        timeout: 300000, // 5분
       });
 
       await page.waitForSelector("#title > h1 > yt-formatted-string", {
