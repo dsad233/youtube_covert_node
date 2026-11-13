@@ -14,9 +14,9 @@ import {
 import { sleep, readPath } from "../utils.js";
 
 export class ApisController {
-  constructor(redisRepository) {
-    this.redisRepository = redisRepository;
-  }
+  // constructor(redisRepository) {
+  //   this.redisRepository = redisRepository;
+  // }
 
   // Youtube MP3로 다운로드
   mp3Download = async (req, res) => {
@@ -31,62 +31,62 @@ export class ApisController {
           .json({ message: "YouTube URL이 필요합니다." });
       }
 
-      if (
-        await this.redisRepository.get(
-          `SESSION:userIp=${req.ip.trim() || req.ips[0].trim()}`,
-        )
-      ) {
-        return res.status(StatusCodes.TOO_MANY_REQUESTS).json({
-          message:
-            "현재 너무 많은 요청이 있습니다. 잠시 후 다시 시도해 주세요.",
-        });
-      }
+      // if (
+      //   await this.redisRepository.get(
+      //     `SESSION:userIp=${req.ip.trim() || req.ips[0].trim()}`,
+      //   )
+      // ) {
+      //   return res.status(StatusCodes.TOO_MANY_REQUESTS).json({
+      //     message:
+      //       "현재 너무 많은 요청이 있습니다. 잠시 후 다시 시도해 주세요.",
+      //   });
+      // }
 
-      await this.redisRepository.setex(
-        `SESSION:userIp=${req.ip.trim() || req.ips[0].trim()}`,
-        60,
-        "LOCKED",
-      );
+      // await this.redisRepository.setex(
+      //   `SESSION:userIp=${req.ip.trim() || req.ips[0].trim()}`,
+      //   60,
+      //   "LOCKED",
+      // );
 
-      const musicInfos = {};
+      // const musicInfos = {};
 
-      const browser = await puppeteer.launch({
-        headless: true,
-        args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      });
-      const page = await browser.newPage();
+      // const browser = await puppeteer.launch({
+      //   headless: true,
+      //   args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      // });
+      // const page = await browser.newPage();
 
-      await page.goto(url.trim(), {
-        waitUntil: "networkidle2",
-        timeout: 300000, // 5분
-      });
+      // await page.goto(url.trim(), {
+      //   waitUntil: "networkidle2",
+      //   timeout: 300000, // 5분
+      // });
 
-      await page.waitForSelector("#title > h1 > yt-formatted-string", {
-        timeout: 1000,
-      });
+      // await page.waitForSelector("#title > h1 > yt-formatted-string", {
+      //   timeout: 1000,
+      // });
 
-      const content = await page.content();
-      await sleep(600);
+      // const content = await page.content();
+      // await sleep(600);
 
-      const nowPageUrl = await page.url();
-      const urlSlice = nowPageUrl.slice(
-        nowPageUrl.indexOf("v=") + 2,
-        nowPageUrl.search("&", 1),
-      );
+      // const nowPageUrl = await page.url();
+      // const urlSlice = nowPageUrl.slice(
+      //   nowPageUrl.indexOf("v=") + 2,
+      //   nowPageUrl.search("&", 1),
+      // );
 
-      const $ = cheerio.load(content);
+      // const $ = cheerio.load(content);
 
-      const musicTitle = $("#title > h1 > yt-formatted-string").html();
-      const music_artist = $("#text > a").html();
+      // const musicTitle = $("#title > h1 > yt-formatted-string").html();
+      // const music_artist = $("#text > a").html();
 
-      if (musicTitle && music_artist) {
-        musicInfos["title"] = musicTitle;
-        musicInfos["artist"] = music_artist;
-        musicInfos["image"] =
-          `https://i.ytimg.com/vi/${urlSlice}/hqdefault.jpg`;
-      }
+      // if (musicTitle && music_artist) {
+      //   musicInfos["title"] = musicTitle;
+      //   musicInfos["artist"] = music_artist;
+      //   musicInfos["image"] =
+      //     `https://i.ytimg.com/vi/${urlSlice}/hqdefault.jpg`;
+      // }
 
-      await browser.close();
+      // await browser.close();
 
       const tempName = MP3_TEMP_FILENAME;
       const outputName = MP3_FILENAME;
@@ -135,38 +135,50 @@ export class ApisController {
       fs.unlinkSync(tempPath);
 
       console.log("\n----- processing end -----");
+
+      return res
+        .status(StatusCodes.OK)
+        .json({ message: "MP3 파일로 변환 성공!" });
+
+      // return res.status(StatusCodes.OK).json({
+      //   message: "MP3 파일로 변환 성공!",
+      //   data: musicInfos,
+      //   buffer: JSON.stringify(concatBuffer.toString("base64")),
+      // });
+
       // 최종 버퍼 파일
-      const result = [];
-      const mp3File = fs.createReadStream(outputPath, { highWaterMark: 16 });
+      // const result = [];
+      // const mp3File = fs.createReadStream(outputPath, { highWaterMark: 16 });
 
-      if (!mp3File) {
-        return res
-          .status(StatusCodes.NOT_FOUND)
-          .json({ message: "MP3 파일 전송 실패" });
-      }
+      // if (!mp3File) {
+      //   return res
+      //     .status(StatusCodes.NOT_FOUND)
+      //     .json({ message: "MP3 파일 전송 실패" });
+      // }
 
-      mp3File.on("data", (chunck) => {
-        result.push(chunck);
-      });
+      // mp3File.on("data", (chunck) => {
+      //   result.push(chunck);
+      // });
 
-      mp3File.on("end", () => {
-        const concatBuffer = Buffer.concat(result);
-        return res.status(StatusCodes.OK).json({
-          message: "MP3 파일로 변환 성공!",
-          data: musicInfos,
-          buffer: JSON.stringify(concatBuffer.toString("base64")),
-        });
-      });
+      // mp3File.on("end", () => {
+      //   const concatBuffer = Buffer.concat(result);
+      //   return res.status(StatusCodes.OK).json({
+      //     message: "MP3 파일로 변환 성공!",
+      //     data: musicInfos,
+      //     buffer: JSON.stringify(concatBuffer.toString("base64")),
+      //   });
+      // });
     } catch (err) {
       console.error(err);
       return res
         .status(StatusCodes.INTERNAL_SERVER_ERROR)
         .json({ message: "MP3로 변환 실패" });
-    } finally {
-      await this.redisRepository.remove(
-        `SESSION:userIp=${req.ip.trim() || req.ips[0].trim()}`,
-      );
     }
+    // finally {
+    //   await this.redisRepository.remove(
+    //     `SESSION:userIp=${req.ip.trim() || req.ips[0].trim()}`,
+    //   );
+    // }
   };
 
   // Youtube MP4로 다운로드
@@ -182,61 +194,61 @@ export class ApisController {
           .json({ message: "YouTube URL이 필요합니다." });
       }
 
-      if (
-        await this.redisRepository.get(
-          `SESSION:userIp=${req.ip.trim() || req.ips[0].trim()}`,
-        )
-      ) {
-        return res.status(StatusCodes.TOO_MANY_REQUESTS).json({
-          message:
-            "현재 너무 많은 요청이 있습니다. 잠시 후 다시 시도해 주세요.",
-        });
-      }
+      // if (
+      //   await this.redisRepository.get(
+      //     `SESSION:userIp=${req.ip.trim() || req.ips[0].trim()}`,
+      //   )
+      // ) {
+      //   return res.status(StatusCodes.TOO_MANY_REQUESTS).json({
+      //     message:
+      //       "현재 너무 많은 요청이 있습니다. 잠시 후 다시 시도해 주세요.",
+      //   });
+      // }
 
-      await this.redisRepository.setex(
-        `SESSION:userIp=${req.ip.trim() || req.ips[0].trim()}`,
-        60,
-        "LOCKED",
-      );
+      // await this.redisRepository.setex(
+      //   `SESSION:userIp=${req.ip.trim() || req.ips[0].trim()}`,
+      //   60,
+      //   "LOCKED",
+      // );
 
-      const musicInfos = {};
+      // const musicInfos = {};
 
-      const browser = await puppeteer.launch({
-        headless: true,
-      });
-      const page = await browser.newPage();
+      // const browser = await puppeteer.launch({
+      //   headless: true,
+      // });
+      // const page = await browser.newPage();
 
-      await page.goto(url.trim(), {
-        waitUntil: "networkidle2",
-        timeout: 300000, // 5분
-      });
+      // await page.goto(url.trim(), {
+      //   waitUntil: "networkidle2",
+      //   timeout: 300000, // 5분
+      // });
 
-      await page.waitForSelector("#title > h1 > yt-formatted-string", {
-        timeout: 1000,
-      });
+      // await page.waitForSelector("#title > h1 > yt-formatted-string", {
+      //   timeout: 1000,
+      // });
 
-      const content = await page.content();
-      await sleep(600);
+      // const content = await page.content();
+      // await sleep(600);
 
-      const nowPageUrl = await page.url();
-      const urlSlice = nowPageUrl.slice(
-        nowPageUrl.indexOf("v=") + 2,
-        nowPageUrl.search("&", 1),
-      );
+      // const nowPageUrl = await page.url();
+      // const urlSlice = nowPageUrl.slice(
+      //   nowPageUrl.indexOf("v=") + 2,
+      //   nowPageUrl.search("&", 1),
+      // );
 
-      const $ = cheerio.load(content);
+      // const $ = cheerio.load(content);
 
-      const musicTitle = $("#title > h1 > yt-formatted-string").html();
-      const music_artist = $("#text > a").html();
+      // const musicTitle = $("#title > h1 > yt-formatted-string").html();
+      // const music_artist = $("#text > a").html();
 
-      if (musicTitle && music_artist) {
-        musicInfos["title"] = musicTitle;
-        musicInfos["artist"] = music_artist;
-        musicInfos["image"] =
-          `https://i.ytimg.com/vi/${urlSlice}/hqdefault.jpg`;
-      }
+      // if (musicTitle && music_artist) {
+      //   musicInfos["title"] = musicTitle;
+      //   musicInfos["artist"] = music_artist;
+      //   musicInfos["image"] =
+      //     `https://i.ytimg.com/vi/${urlSlice}/hqdefault.jpg`;
+      // }
 
-      await browser.close();
+      // await browser.close();
 
       const tempName = MP4_TEMP_FILENAME;
       const outputName = MP4_FILENAME;
@@ -285,36 +297,40 @@ export class ApisController {
 
       console.log("\n----- processing end -----");
 
-      const result = [];
-      const mp4File = fs.createReadStream(outputPath, { highWaterMark: 16 });
+      // const result = [];
+      // const mp4File = fs.createReadStream(outputPath, { highWaterMark: 16 });
 
-      if (!mp4File) {
-        return res
-          .status(StatusCodes.NOT_FOUND)
-          .json({ message: "MP4 파일 전송 실패" });
-      }
+      // if (!mp4File) {
+      //   return res
+      //     .status(StatusCodes.NOT_FOUND)
+      //     .json({ message: "MP4 파일 전송 실패" });
+      // }
 
-      mp4File.on("data", (chunck) => {
-        result.push(chunck);
-      });
+      // mp4File.on("data", (chunck) => {
+      //   result.push(chunck);
+      // });
 
-      mp4File.on("end", () => {
-        const concatBuffer = Buffer.concat(result);
-        return res.status(StatusCodes.OK).json({
-          message: "MP4 파일로 변환 성공!",
-          data: musicInfos,
-          buffer: JSON.stringify(concatBuffer.toString("base64")),
-        });
+      // mp4File.on("end", () => {
+      //   const concatBuffer = Buffer.concat(result);
+      //   return res.status(StatusCodes.OK).json({
+      //     message: "MP4 파일로 변환 성공!",
+      //     data: musicInfos,
+      //     buffer: JSON.stringify(concatBuffer.toString("base64")),
+      //   });
+      // });
+      return res.status(StatusCodes.OK).json({
+        message: "MP4 파일로 변환 성공!",
       });
     } catch (err) {
       console.error(err);
       return res
         .status(StatusCodes.INTERNAL_SERVER_ERROR)
         .json({ message: "MP4로 변환 실패" });
-    } finally {
-      await this.redisRepository.remove(
-        `SESSION:userIp=${req.ip.trim() || req.ips[0].trim()}`,
-      );
     }
+    // finally {
+    //   await this.redisRepository.remove(
+    //     `SESSION:userIp=${req.ip.trim() || req.ips[0].trim()}`,
+    //   );
+    // }
   };
 }

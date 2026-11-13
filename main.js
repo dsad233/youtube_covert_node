@@ -23,7 +23,8 @@ if (NODE_ENV === EnvironmentEnv.PROD) {
   app.use(ratelimitConfig());
 }
 
-app.use("/api", ApiRouter);
+// app.use("/api", ApiRouter);
+app.use(ApiRouter);
 
 app.use(ErrorMiddleware);
 
